@@ -328,39 +328,63 @@ end
 
 -- Initialize
 function Arsenal:Init()
-    -- Create ESP for existing players
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            self:CreateESP(player)
+    pcall(function()
+        -- Create ESP for existing players
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                pcall(function()
+                    self:CreateESP(player)
+                end)
+            end
         end
-    end
-    
-    -- Handle new players
-    Players.PlayerAdded:Connect(function(player)
-        self:CreateESP(player)
-    end)
-    
-    -- Handle player removal
-    Players.PlayerRemoving:Connect(function(player)
-        self:RemoveESP(player)
-    end)
-    
-    -- Create FOV Circle
-    self:CreateFOVCircle()
-    
-    -- Update loops
-    RunService.RenderStepped:Connect(function()
-        self:UpdateESP()
-        self:UpdateAimbot()
-        self:UpdateMovement()
         
-        -- Update FOV Circle
-        if FOVCircle then
-            local mousePos = UserInputService:GetMouseLocation()
-            FOVCircle.Position = mousePos
-            FOVCircle.Radius = self.Settings.Aimbot.FOV
-            FOVCircle.Visible = self.Settings.Aimbot.ShowFOV and self.Settings.Aimbot.Enabled
-        end
+        -- Handle new players
+        Players.PlayerAdded:Connect(function(player)
+            pcall(function()
+                self:CreateESP(player)
+            end)
+        end)
+        
+        -- Handle player removal
+        Players.PlayerRemoving:Connect(function(player)
+            pcall(function()
+                self:RemoveESP(player)
+            end)
+        end)
+        
+        -- Create FOV Circle
+        pcall(function()
+            self:CreateFOVCircle()
+        end)
+        
+        -- Update loops
+        RunService.RenderStepped:Connect(function()
+            pcall(function()
+                self:UpdateESP()
+            end)
+            
+            if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+                pcall(function()
+                    self:UpdateAimbot()
+                end)
+            end
+            
+            pcall(function()
+                self:UpdateMovement()
+            end)
+            
+            -- Update FOV Circle
+            if FOVCircle then
+                pcall(function()
+                    local mousePos = UserInputService:GetMouseLocation()
+                    FOVCircle.Position = mousePos
+                    FOVCircle.Radius = self.Settings.Aimbot.FOV
+                    FOVCircle.Visible = self.Settings.Aimbot.ShowFOV and self.Settings.Aimbot.Enabled
+                end)
+            end
+        end)
+        
+        print("[Arsenal] Initialized successfully!")
     end)
 end
 
