@@ -29,13 +29,29 @@ local currentGameId = game.PlaceId
 
 -- Detect Game
 local function DetectGame()
-    if currentGameId == GAME_IDS.Arsenal then
+    -- Direct PlaceId check first
+    if currentGameId == GAME_IDS.Arsenal or currentGameId == 286090429 then
         return "Arsenal"
-    elseif currentGameId == GAME_IDS.PrisonLife then
+    elseif currentGameId == GAME_IDS.PrisonLife or currentGameId == 155615604 or currentGameId == 1122957364 then
         return "Prison Life"
-    else
-        return "Universal"
     end
+    
+    -- Fallback: check game name
+    local success, gameName = pcall(function()
+        return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name:lower()
+    end)
+    
+    if success and gameName then
+        if gameName:find("arsenal") then
+            return "Arsenal"
+        elseif gameName:find("prison") then
+            return "Prison Life"
+        end
+    end
+    
+    -- If still unknown, return Universal
+    print("[InovoHub] Unknown game - PlaceId: " .. tostring(currentGameId))
+    return "Universal"
 end
 
 local gameName = DetectGame()
@@ -46,11 +62,12 @@ local Window = InovoLib:CreateWindow({
     Size = UDim2.new(0, 600, 0, 450)
 })
 
--- Notification
+-- Small notification (removed big one)
+task.wait(0.5)
 InovoLib:Notify({
     Title = "InovoProductions",
-    Message = "Loaded for " .. gameName .. "!",
-    Duration = 5,
+    Message = "Hub loaded successfully!",
+    Duration = 3,
     Type = "Success"
 })
 
