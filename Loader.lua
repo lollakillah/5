@@ -19,68 +19,37 @@ _G.InovoLoaded = true
 -- Load Library
 local InovoLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/lollakillah/5/main/InovoLib.lua"))()
 
--- Game IDs
-local GAME_IDS = {
-    Arsenal = 286090429,
-    PrisonLife = 155615604,
-}
-
-local currentGameId = game.PlaceId
-
--- Detect Game
-local function DetectGame()
-    -- Direct PlaceId check first
-    if currentGameId == GAME_IDS.Arsenal or currentGameId == 286090429 then
-        return "Arsenal"
-    elseif currentGameId == GAME_IDS.PrisonLife or currentGameId == 155615604 or currentGameId == 1122957364 then
-        return "Prison Life"
-    end
-    
-    -- Fallback: check game name
-    local success, gameName = pcall(function()
-        return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name:lower()
-    end)
-    
-    if success and gameName then
-        if gameName:find("arsenal") then
-            return "Arsenal"
-        elseif gameName:find("prison") then
-            return "Prison Life"
-        end
-    end
-    
-    -- If still unknown, return Universal
-    print("[InovoHub] Unknown game - PlaceId: " .. tostring(currentGameId))
-    return "Universal"
-end
-
-local gameName = DetectGame()
-
--- Create Window
+-- Create Main Selection Window
 local Window = InovoLib:CreateWindow({
-    Title = "InovoProductions | " .. gameName,
-    Size = UDim2.new(0, 600, 0, 450)
+    Title = "InovoProductions - Select Game",
+    Size = UDim2.new(0, 400, 0, 300)
 })
 
--- Small notification (removed big one)
-task.wait(0.5)
-InovoLib:Notify({
-    Title = "InovoProductions",
-    Message = "Hub loaded successfully!",
-    Duration = 3,
-    Type = "Success"
-})
+local SelectTab = Window:CreateTab("Game Selector")
 
--- Load game-specific script
-if gameName == "Arsenal" then
-    local Arsenal = loadstring(game:HttpGet("https://raw.githubusercontent.com/lollakillah/5/main/Games/Arsenal.lua"))()
-    Arsenal:Init()
-    
-    -- Create Tabs
-    local CombatTab = Window:CreateTab("Combat")
-    local VisualsTab = Window:CreateTab("Visuals")
-    local MovementTab = Window:CreateTab("Movement")
-    local MiscTab = Window:CreateTab("Misc")
+SelectTab:AddLabel("Select which game to load:")
+SelectTab:AddDivider()
+
+-- Arsenal Button
+SelectTab:AddButton({
+    Text = "🔫 Arsenal",
+    Callback = function()
+        Window.GUI:Destroy()
+        task.wait(0.1)
+        
+        -- Load Arsenal
+        local ArsenalWindow = InovoLib:CreateWindow({
+            Title = "InovoProductions | Arsenal",
+            Size = UDim2.new(0, 600, 0, 450)
+        })
+        local Arsenal = loadstring(game:HttpGet("https://raw.githubusercontent.com/lollakillah/5/main/Games/Arsenal.lua"))()
+        Arsenal:Init()
+        
+        -- Create Tabs
+        local CombatTab = ArsenalWindow:CreateTab("Combat")
+        local VisualsTab = ArsenalWindow:CreateTab("Visuals")
+        local MovementTab = ArsenalWindow:CreateTab("Movement")
+        local MiscTab = ArsenalWindow:CreateTab("Misc")
     
     -- Combat Tab
     CombatTab:AddLabel("Aimbot Settings")
@@ -92,11 +61,6 @@ if gameName == "Arsenal" then
         Flag = "AimbotEnabled",
         Callback = function(value)
             Arsenal.Settings.Aimbot.Enabled = value
-            InovoLib:Notify({
-                Title = "Aimbot",
-                Message = value and "Enabled" or "Disabled",
-                Type = value and "Success" or "Info"
-            })
         end
     })
     
@@ -202,11 +166,6 @@ if gameName == "Arsenal" then
         Flag = "ESPEnabled",
         Callback = function(value)
             Arsenal.Settings.ESP.Enabled = value
-            InovoLib:Notify({
-                Title = "ESP",
-                Message = value and "Enabled" or "Disabled",
-                Type = value and "Success" or "Info"
-            })
         end
     })
     
@@ -329,20 +288,33 @@ if gameName == "Arsenal" then
         end
     })
     
-    MiscTab:AddDivider()
-    MiscTab:AddLabel("Credits: InovoProductions")
-    MiscTab:AddLabel("Version: 1.0.0")
-    
-elseif gameName == "Prison Life" then
-    local PrisonLife = loadstring(game:HttpGet("https://raw.githubusercontent.com/lollakillah/5/main/Games/PrisonLife.lua"))()
-    PrisonLife:Init()
-    
-    -- Create Tabs
-    local CombatTab = Window:CreateTab("Combat")
-    local VisualsTab = Window:CreateTab("Visuals")
-    local TeleportsTab = Window:CreateTab("Teleports")
-    local MovementTab = Window:CreateTab("Movement")
-    local MiscTab = Window:CreateTab("Misc")
+        MiscTab:AddDivider()
+        MiscTab:AddLabel("Credits: InovoProductions")
+        MiscTab:AddLabel("Version: 1.0.0")
+    end
+})
+
+-- Prison Life Button
+SelectTab:AddButton({
+    Text = "🚔 Prison Life",
+    Callback = function()
+        Window.GUI:Destroy()
+        task.wait(0.1)
+        
+        -- Load Prison Life
+        local PLWindow = InovoLib:CreateWindow({
+            Title = "InovoProductions | Prison Life",
+            Size = UDim2.new(0, 600, 0, 450)
+        })
+        local PrisonLife = loadstring(game:HttpGet("https://raw.githubusercontent.com/lollakillah/5/main/Games/PrisonLife.lua"))()
+        PrisonLife:Init()
+        
+        -- Create Tabs
+        local CombatTab = PLWindow:CreateTab("Combat")
+        local VisualsTab = PLWindow:CreateTab("Visuals")
+        local TeleportsTab = PLWindow:CreateTab("Teleports")
+        local MovementTab = PLWindow:CreateTab("Movement")
+        local MiscTab = PLWindow:CreateTab("Misc")
     
     -- Combat Tab
     CombatTab:AddLabel("Combat Settings")
@@ -354,11 +326,6 @@ elseif gameName == "Prison Life" then
         Flag = "KillAura",
         Callback = function(value)
             PrisonLife.Settings.Combat.KillAura = value
-            InovoLib:Notify({
-                Title = "Kill Aura",
-                Message = value and "Enabled" or "Disabled",
-                Type = value and "Success" or "Info"
-            })
         end
     })
     
@@ -393,11 +360,6 @@ elseif gameName == "Prison Life" then
         Flag = "AutoFarm",
         Callback = function(value)
             PrisonLife.Settings.AutoFarm.Enabled = value
-            InovoLib:Notify({
-                Title = "Auto Farm",
-                Message = value and "Enabled - Farm Cops" or "Disabled",
-                Type = value and "Success" or "Info"
-            })
         end
     })
     
@@ -420,11 +382,6 @@ elseif gameName == "Prison Life" then
         Flag = "PLESPEnabled",
         Callback = function(value)
             PrisonLife.Settings.ESP.Enabled = value
-            InovoLib:Notify({
-                Title = "ESP",
-                Message = value and "Enabled" or "Disabled",
-                Type = value and "Success" or "Info"
-            })
         end
     })
     
@@ -482,11 +439,6 @@ elseif gameName == "Prison Life" then
             Text = locationName,
             Callback = function()
                 PrisonLife:Teleport(locationCFrame)
-                InovoLib:Notify({
-                    Title = "Teleport",
-                    Message = "Teleported to " .. locationName,
-                    Type = "Success"
-                })
             end
         })
     end
@@ -498,38 +450,14 @@ elseif gameName == "Prison Life" then
     TeleportsTab:AddButton({
         Text = "Save Position",
         Callback = function()
-            if PrisonLife:SavePosition() then
-                InovoLib:Notify({
-                    Title = "Position",
-                    Message = "Position saved!",
-                    Type = "Success"
-                })
-            else
-                InovoLib:Notify({
-                    Title = "Error",
-                    Message = "Failed to save position",
-                    Type = "Error"
-                })
-            end
+            PrisonLife:SavePosition()
         end
     })
     
     TeleportsTab:AddButton({
         Text = "Load Position",
         Callback = function()
-            if PrisonLife:LoadPosition() then
-                InovoLib:Notify({
-                    Title = "Position",
-                    Message = "Teleported to saved position!",
-                    Type = "Success"
-                })
-            else
-                InovoLib:Notify({
-                    Title = "Error",
-                    Message = "No saved position found",
-                    Type = "Error"
-                })
-            end
+            PrisonLife:LoadPosition()
         end
     })
     
@@ -586,38 +514,14 @@ elseif gameName == "Prison Life" then
     MiscTab:AddButton({
         Text = "Get All Guns",
         Callback = function()
-            if PrisonLife:GetAllGuns() then
-                InovoLib:Notify({
-                    Title = "Guns",
-                    Message = "Collected all guns!",
-                    Type = "Success"
-                })
-            else
-                InovoLib:Notify({
-                    Title = "Error",
-                    Message = "Failed to get guns",
-                    Type = "Error"
-                })
-            end
+            PrisonLife:GetAllGuns()
         end
     })
     
     MiscTab:AddButton({
         Text = "Auto Escape (Become Criminal)",
         Callback = function()
-            if PrisonLife:AutoEscape() then
-                InovoLib:Notify({
-                    Title = "Escape",
-                    Message = "You are now a Criminal!",
-                    Type = "Success"
-                })
-            else
-                InovoLib:Notify({
-                    Title = "Info",
-                    Message = "Already escaped or not an inmate",
-                    Type = "Info"
-                })
-            end
+            PrisonLife:AutoEscape()
         end
     })
     
@@ -632,32 +536,16 @@ elseif gameName == "Prison Life" then
         end
     })
     
-    MiscTab:AddDivider()
-    MiscTab:AddLabel("Credits: InovoProductions")
-    MiscTab:AddLabel("Version: 1.0.0")
-    
-else
-    -- Universal Tab
-    local UniversalTab = Window:CreateTab("Universal")
-    
-    UniversalTab:AddLabel("Game Not Supported")
-    UniversalTab:AddDivider()
-    
-    UniversalTab:AddLabel("This game is not officially supported.")
-    UniversalTab:AddLabel("Supported games:")
-    UniversalTab:AddLabel("- Arsenal")
-    UniversalTab:AddLabel("- Prison Life")
-    
-    UniversalTab:AddDivider()
-    UniversalTab:AddLabel("Credits: InovoProductions")
-    
-    InovoLib:Notify({
-        Title = "Warning",
-        Message = "This game is not supported!",
-        Duration = 5,
-        Type = "Warning"
-    })
-end
+        MiscTab:AddDivider()
+        MiscTab:AddLabel("Credits: InovoProductions")
+        MiscTab:AddLabel("Version: 1.0.0")
+    end
+})
 
-print("[InovoHub] Successfully loaded for " .. gameName .. "!")
+SelectTab:AddDivider()
+SelectTab:AddLabel("")
+SelectTab:AddLabel("Credits: InovoProductions")
+SelectTab:AddLabel("Version: 1.0.0")
+
+print("[InovoHub] Loaded successfully!")
 
