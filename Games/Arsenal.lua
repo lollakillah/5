@@ -32,12 +32,12 @@ Arsenal.Settings = {
         ShowDistance = true,
         ShowBox = true,
         ShowHealthBar = true,
-        TeamCheck = true,
+        TeamCheckESP = true,
         Color = Color3.fromRGB(255, 0, 0),
     },
     Aimbot = {
         Enabled = false,
-        TeamCheck = true,
+        TeamCheckAimbot = true,
         VisibleCheck = true,
         FOV = 100,
         Smoothness = 5,
@@ -159,7 +159,7 @@ function Arsenal:UpdateESP()
             local humanoid = player.Character.Humanoid
             
             -- Team check
-            if self.Settings.ESP.TeamCheck and player.Team == LocalPlayer.Team then
+            if self.Settings.ESP.TeamCheckESP and player.Team == LocalPlayer.Team then
                 for _, drawing in pairs(esp.Drawings) do
                     drawing.Visible = false
                 end
@@ -257,7 +257,7 @@ function Arsenal:GetClosestPlayer()
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
             -- Team check
-            if self.Settings.Aimbot.TeamCheck and player.Team == LocalPlayer.Team then
+            if self.Settings.Aimbot.TeamCheckAimbot and player.Team == LocalPlayer.Team then
                 continue
             end
             

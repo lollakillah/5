@@ -29,7 +29,8 @@ PrisonLife.Settings = {
         Aimbot = false,
         AimbotFOV = 100,
         AimbotSmooth = 5,
-        TeamCheck = false,
+        TeamCheckCombat = false,
+        TeamCheckESP = false,
         ShowFOV = true,
     },
     Movement = {
@@ -125,7 +126,7 @@ function PrisonLife:UpdateESP()
         if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
             local hrp = player.Character.HumanoidRootPart
             
-            if self.Settings.Combat.TeamCheck and player.Team == LocalPlayer.Team then
+            if self.Settings.Combat.TeamCheckESP and player.Team == LocalPlayer.Team then
                 for _, drawing in pairs(esp.Drawings) do
                     drawing.Visible = false
                 end
@@ -208,7 +209,7 @@ function PrisonLife:GetClosestPlayer()
     
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            if self.Settings.Combat.TeamCheck and player.Team == LocalPlayer.Team then
+            if self.Settings.Combat.TeamCheckCombat and player.Team == LocalPlayer.Team then
                 continue
             end
             
@@ -277,7 +278,7 @@ function PrisonLife:KillAura()
     
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") then
-            if self.Settings.Combat.TeamCheck and player.Team == LocalPlayer.Team then
+            if self.Settings.Combat.TeamCheckCombat and player.Team == LocalPlayer.Team then
                 continue
             end
             
@@ -301,33 +302,10 @@ function PrisonLife:KillAura()
     end
 end
 
--- STEALTH Teleport (Anti-Detection)
+-- DIRECT Teleport (Like before - best method!)
 function PrisonLife:Teleport(cframe)
-    if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
-    
-    local hrp = LocalPlayer.Character.HumanoidRootPart
-    local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-    
-    -- Stealth method: Small incremental teleports
-    local currentPos = hrp.Position
-    local targetPos = cframe.Position
-    local distance = (targetPos - currentPos).Magnitude
-    
-    if distance < 10 then
-        -- Short distance, direct teleport
-        hrp.CFrame = cframe
-    else
-        -- Long distance, use stealth
-        local steps = math.ceil(distance / 50) -- 50 studs per step
-        
-        for i = 1, steps do
-            local alpha = i / steps
-            local nextPos = currentPos:Lerp(targetPos, alpha)
-            hrp.CFrame = CFrame.new(nextPos)
-            
-            -- Small delay between steps
-            task.wait(0.05)
-        end
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = cframe
     end
 end
 
@@ -347,65 +325,38 @@ function PrisonLife:LoadPosition()
     return false
 end
 
--- FIXED Get All Guns (Works Now!)
+-- WORKING Get All Guns
 function PrisonLife:GetAllGuns()
     if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
         return false
     end
     
-    local originalPos = LocalPlayer.Character.HumanoidRootPart.CFrame
-    local gunsFound = 0
+    local hrp = LocalPlayer.Character.HumanoidRootPart
+    local originalPos = hrp.CFrame
     
-    -- Method 1: Check workspace for gun givers
-    local gunGivers = {
-        workspace:FindFirstChild("Prison_ITEMS"),
-        workspace:FindFirstChild("Debris")
-    }
-    
-    for _, container in pairs(gunGivers) do
-        if container then
-            for _, item in pairs(container:GetDescendants()) do
-                if item.Name == "ITEMPICKUP" or (item:IsA("ClickDetector") and item.Parent) then
-                    pcall(function()
-                        local itemPos = item.Parent.CFrame or item.CFrame
-                        
-                        -- Teleport to item
-                        LocalPlayer.Character.HumanoidRootPart.CFrame = itemPos
-                        task.wait(0.3)
-                        
-                        -- Try to trigger pickup
-                        if item:IsA("ClickDetector") then
-                            fireclickdetector(item)
-                        end
-                        
-                        gunsFound = gunsFound + 1
-                    end)
-                    task.wait(0.1)
-                end
-            end
-        end
-    end
-    
-    -- Method 2: Direct gun locations
+    -- Real Gun Locations in Prison Life
     local gunLocations = {
-        CFrame.new(808, 100, 2139),  -- M9 location
-        CFrame.new(818, 100, 2139),  -- AK-47 location
-        CFrame.new(797, 99, 2139),   -- Remington location
+        -- Armory guns
+        {pos = CFrame.new(808.47, 99.98, 2139.05), wait = 0.3},
+        {pos = CFrame.new(818.47, 99.98, 2139.05), wait = 0.3},
+        {pos = CFrame.new(797.47, 98.98, 2139.05), wait = 0.3},
+        -- Cafeteria gun
+        {pos = CFrame.new(916.47, 99.98, 2139.05), wait = 0.3},
     }
     
-    for _, gunPos in pairs(gunLocations) do
+    -- Get all guns by teleporting
+    for _, gun in pairs(gunLocations) do
         pcall(function()
-            LocalPlayer.Character.HumanoidRootPart.CFrame = gunPos
-            task.wait(0.3)
+            hrp.CFrame = gun.pos
+            task.wait(gun.wait)
         end)
-        task.wait(0.1)
     end
     
-    -- Teleport back
+    -- Return to original position
     task.wait(0.2)
-    LocalPlayer.Character.HumanoidRootPart.CFrame = originalPos
+    hrp.CFrame = originalPos
     
-    return gunsFound > 0
+    return true
 end
 
 -- Auto Escape

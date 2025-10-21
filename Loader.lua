@@ -150,7 +150,7 @@ arsenalGrad.Color = ColorSequence.new{
 arsenalGrad.Rotation = 45
 arsenalGrad.Parent = arsenalImg
 
--- Arsenal Icon Text
+-- Arsenal Icon Text  
 local arsenalIcon = Instance.new("TextLabel")
 arsenalIcon.Size = UDim2.new(1, 0, 1, 0)
 arsenalIcon.BackgroundTransparency = 1
@@ -158,6 +158,18 @@ arsenalIcon.Text = "🔫"
 arsenalIcon.TextSize = 60
 arsenalIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
 arsenalIcon.Parent = arsenalImg
+
+-- Try to load actual Arsenal image
+pcall(function()
+    local arsenalActualImg = Instance.new("ImageLabel")
+    arsenalActualImg.Size = UDim2.new(1, 0, 1, 0)
+    arsenalActualImg.BackgroundTransparency = 1
+    arsenalActualImg.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png" -- Fallback
+    arsenalActualImg.ScaleType = Enum.ScaleType.Crop
+    arsenalActualImg.ZIndex = 2
+    arsenalActualImg.Parent = arsenalImg
+    arsenalIcon.Visible = false
+end)
 
 -- Arsenal Label
 local arsenalLabel = Instance.new("TextLabel")
@@ -212,6 +224,18 @@ prisonIcon.TextSize = 60
 prisonIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
 prisonIcon.Parent = prisonImg
 
+-- Try to load actual Prison Life image
+pcall(function()
+    local prisonActualImg = Instance.new("ImageLabel")
+    prisonActualImg.Size = UDim2.new(1, 0, 1, 0)
+    prisonActualImg.BackgroundTransparency = 1
+    prisonActualImg.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png" -- Fallback
+    prisonActualImg.ScaleType = Enum.ScaleType.Crop
+    prisonActualImg.ZIndex = 2
+    prisonActualImg.Parent = prisonImg
+    prisonIcon.Visible = false
+end)
+
 -- Prison Life Label
 local prisonLabel = Instance.new("TextLabel")
 prisonLabel.Size = UDim2.new(1, 0, 0, 80)
@@ -251,7 +275,7 @@ arsenalBtn.MouseButton1Click:Connect(function()
     
     local Window = InovoLib:CreateWindow({
         Title = "InovoProductions | Arsenal",
-        Size = UDim2.new(0, 600, 0, 450)
+        Size = UDim2.new(0, 650, 0, 550)
     })
     
     local CombatTab = Window:CreateTab("Combat")
@@ -272,10 +296,10 @@ arsenalBtn.MouseButton1Click:Connect(function()
     })
     
     CombatTab:AddToggle({
-        Text = "Team Check",
+        Text = "Team Check (Aimbot)",
         Default = true,
         Callback = function(value)
-            Arsenal.Settings.Aimbot.TeamCheck = value
+            Arsenal.Settings.Aimbot.TeamCheckAimbot = value
         end
     })
     
@@ -371,10 +395,10 @@ arsenalBtn.MouseButton1Click:Connect(function()
     })
     
     VisualsTab:AddToggle({
-        Text = "Team Check",
+        Text = "Team Check (ESP)",
         Default = true,
         Callback = function(value)
-            Arsenal.Settings.ESP.TeamCheck = value
+            Arsenal.Settings.ESP.TeamCheckESP = value
         end
     })
     
@@ -436,7 +460,7 @@ prisonBtn.MouseButton1Click:Connect(function()
     
     local Window = InovoLib:CreateWindow({
         Title = "InovoProductions | Prison Life",
-        Size = UDim2.new(0, 600, 0, 450)
+        Size = UDim2.new(0, 650, 0, 550)
     })
     
     local CombatTab = Window:CreateTab("Combat")
@@ -481,10 +505,10 @@ prisonBtn.MouseButton1Click:Connect(function()
     })
     
     CombatTab:AddToggle({
-        Text = "Team Check",
+        Text = "Team Check (Combat)",
         Default = false,
         Callback = function(value)
-            PrisonLife.Settings.Combat.TeamCheck = value
+            PrisonLife.Settings.Combat.TeamCheckCombat = value
         end
     })
     
@@ -551,6 +575,14 @@ prisonBtn.MouseButton1Click:Connect(function()
         Default = true,
         Callback = function(value)
             PrisonLife.Settings.ESP.ShowDistance = value
+        end
+    })
+    
+    VisualsTab:AddToggle({
+        Text = "Team Check (ESP)",
+        Default = false,
+        Callback = function(value)
+            PrisonLife.Settings.Combat.TeamCheckESP = value
         end
     })
     
