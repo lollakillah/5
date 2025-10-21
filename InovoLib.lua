@@ -152,7 +152,7 @@ function InovoLib:Notify(options)
     notif.BackgroundColor3 = InovoLib.Theme.BackgroundLight
     notif.BorderSizePixel = 0
     notif.ClipsDescendants = true
-    notif.Parent = notifContainer
+    notif.Parent = self.NotificationContainer
     
     CreateCorner(notif, 8)
     CreateStroke(notif, InovoLib.Theme.Border, 1)
@@ -939,7 +939,13 @@ function InovoLib:CreateWindow(options)
         
         -- Auto-select first tab
         if #self.Tabs == 1 then
-            tabButton.MouseButton1Click:Fire()
+            task.wait(0.1)
+            tabContent.Visible = true
+            Tween(tabButton, {
+                BackgroundColor3 = InovoLib.Theme.Accent,
+                TextColor3 = InovoLib.Theme.TextPrimary
+            })
+            self.CurrentTab = Tab
         end
         
         return Tab

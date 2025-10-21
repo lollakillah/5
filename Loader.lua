@@ -22,17 +22,19 @@ local InovoLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/loll
 -- Create Main Selection Window
 local Window = InovoLib:CreateWindow({
     Title = "InovoProductions - Select Game",
-    Size = UDim2.new(0, 400, 0, 300)
+    Size = UDim2.new(0, 450, 0, 350)
 })
 
 local SelectTab = Window:CreateTab("Game Selector")
 
-SelectTab:AddLabel("Select which game to load:")
+SelectTab:AddLabel("Choose your game:")
 SelectTab:AddDivider()
+SelectTab:AddLabel("")
+SelectTab:AddLabel("")
 
 -- Arsenal Button
 SelectTab:AddButton({
-    Text = "🔫 Arsenal",
+    Text = "Arsenal",
     Callback = function()
         Window.GUI:Destroy()
         task.wait(0.1)
@@ -296,7 +298,7 @@ SelectTab:AddButton({
 
 -- Prison Life Button
 SelectTab:AddButton({
-    Text = "🚔 Prison Life",
+    Text = "Prison Life",
     Callback = function()
         Window.GUI:Destroy()
         task.wait(0.1)
@@ -544,8 +546,8 @@ SelectTab:AddButton({
 
 SelectTab:AddDivider()
 SelectTab:AddLabel("")
-SelectTab:AddLabel("Credits: InovoProductions")
-SelectTab:AddLabel("Version: 1.0.0")
-
-print("[InovoHub] Loaded successfully!")
+SelectTab:AddLabel("")
+SelectTab:AddLabel("")
+SelectTab:AddLabel("InovoProductions v1.0")
+SelectTab:AddLabel("Made by lollakillah")
 
