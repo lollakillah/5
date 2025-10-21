@@ -81,6 +81,42 @@ closeBtn.MouseButton1Click:Connect(function()
     screenGui:Destroy()
 end)
 
+-- Make Draggable
+local dragging = false
+local dragInput, mousePos, framePos
+
+title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        mousePos = input.Position
+        framePos = mainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+title.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - mousePos
+        mainFrame.Position = UDim2.new(
+            framePos.X.Scale,
+            framePos.X.Offset + delta.X,
+            framePos.Y.Scale,
+            framePos.Y.Offset + delta.Y
+        )
+    end
+end)
+
 -- Arsenal Button
 local arsenalBtn = Instance.new("TextButton")
 arsenalBtn.Size = UDim2.new(0, 200, 0, 250)
@@ -94,18 +130,34 @@ local arsenalCorner = Instance.new("UICorner")
 arsenalCorner.CornerRadius = UDim.new(0, 10)
 arsenalCorner.Parent = arsenalBtn
 
--- Arsenal Image
-local arsenalImg = Instance.new("ImageLabel")
+-- Arsenal Image (placeholder with gradient)
+local arsenalImg = Instance.new("Frame")
 arsenalImg.Size = UDim2.new(1, -20, 0, 150)
 arsenalImg.Position = UDim2.new(0, 10, 0, 10)
-arsenalImg.BackgroundTransparency = 1
-arsenalImg.Image = "rbxassetid://YOUR_ARSENAL_IMAGE_ID" -- Replace with actual asset ID
-arsenalImg.ScaleType = Enum.ScaleType.Crop
+arsenalImg.BackgroundColor3 = Color3.fromRGB(230, 70, 70)
+arsenalImg.BorderSizePixel = 0
 arsenalImg.Parent = arsenalBtn
 
 local arsenalImgCorner = Instance.new("UICorner")
 arsenalImgCorner.CornerRadius = UDim.new(0, 8)
 arsenalImgCorner.Parent = arsenalImg
+
+local arsenalGrad = Instance.new("UIGradient")
+arsenalGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(230, 70, 70)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 50, 50))
+}
+arsenalGrad.Rotation = 45
+arsenalGrad.Parent = arsenalImg
+
+-- Arsenal Icon Text
+local arsenalIcon = Instance.new("TextLabel")
+arsenalIcon.Size = UDim2.new(1, 0, 1, 0)
+arsenalIcon.BackgroundTransparency = 1
+arsenalIcon.Text = "🔫"
+arsenalIcon.TextSize = 60
+arsenalIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
+arsenalIcon.Parent = arsenalImg
 
 -- Arsenal Label
 local arsenalLabel = Instance.new("TextLabel")
@@ -131,18 +183,34 @@ local prisonCorner = Instance.new("UICorner")
 prisonCorner.CornerRadius = UDim.new(0, 10)
 prisonCorner.Parent = prisonBtn
 
--- Prison Life Image
-local prisonImg = Instance.new("ImageLabel")
+-- Prison Life Image (placeholder with gradient)
+local prisonImg = Instance.new("Frame")
 prisonImg.Size = UDim2.new(1, -20, 0, 150)
 prisonImg.Position = UDim2.new(0, 10, 0, 10)
-prisonImg.BackgroundTransparency = 1
-prisonImg.Image = "rbxassetid://YOUR_PRISON_IMAGE_ID" -- Replace with actual asset ID
-prisonImg.ScaleType = Enum.ScaleType.Crop
+prisonImg.BackgroundColor3 = Color3.fromRGB(70, 140, 230)
+prisonImg.BorderSizePixel = 0
 prisonImg.Parent = prisonBtn
 
 local prisonImgCorner = Instance.new("UICorner")
 prisonImgCorner.CornerRadius = UDim.new(0, 8)
 prisonImgCorner.Parent = prisonImg
+
+local prisonGrad = Instance.new("UIGradient")
+prisonGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(70, 140, 230)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 100, 180))
+}
+prisonGrad.Rotation = 45
+prisonGrad.Parent = prisonImg
+
+-- Prison Icon Text
+local prisonIcon = Instance.new("TextLabel")
+prisonIcon.Size = UDim2.new(1, 0, 1, 0)
+prisonIcon.BackgroundTransparency = 1
+prisonIcon.Text = "🚔"
+prisonIcon.TextSize = 60
+prisonIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
+prisonIcon.Parent = prisonImg
 
 -- Prison Life Label
 local prisonLabel = Instance.new("TextLabel")
@@ -378,11 +446,11 @@ prisonBtn.MouseButton1Click:Connect(function()
     local MiscTab = Window:CreateTab("Misc")
     
     -- Combat Tab
-    CombatTab:AddLabel("Combat Settings")
+    CombatTab:AddLabel("Kill Aura")
     CombatTab:AddDivider()
     
     CombatTab:AddToggle({
-        Text = "Kill Aura",
+        Text = "Enable Kill Aura",
         Default = false,
         Callback = function(value)
             PrisonLife.Settings.Combat.KillAura = value
@@ -397,6 +465,56 @@ prisonBtn.MouseButton1Click:Connect(function()
         Increment = 1,
         Callback = function(value)
             PrisonLife.Settings.Combat.KillAuraRange = value
+        end
+    })
+    
+    CombatTab:AddDivider()
+    CombatTab:AddLabel("Aimbot")
+    CombatTab:AddDivider()
+    
+    CombatTab:AddToggle({
+        Text = "Enable Aimbot",
+        Default = false,
+        Callback = function(value)
+            PrisonLife.Settings.Combat.Aimbot = value
+        end
+    })
+    
+    CombatTab:AddToggle({
+        Text = "Team Check",
+        Default = false,
+        Callback = function(value)
+            PrisonLife.Settings.Combat.TeamCheck = value
+        end
+    })
+    
+    CombatTab:AddToggle({
+        Text = "Show FOV Circle",
+        Default = true,
+        Callback = function(value)
+            PrisonLife.Settings.Combat.ShowFOV = value
+        end
+    })
+    
+    CombatTab:AddSlider({
+        Text = "FOV Size",
+        Min = 10,
+        Max = 500,
+        Default = 100,
+        Increment = 5,
+        Callback = function(value)
+            PrisonLife.Settings.Combat.AimbotFOV = value
+        end
+    })
+    
+    CombatTab:AddSlider({
+        Text = "Smoothness",
+        Min = 1,
+        Max = 20,
+        Default = 5,
+        Increment = 1,
+        Callback = function(value)
+            PrisonLife.Settings.Combat.AimbotSmooth = value
         end
     })
     
