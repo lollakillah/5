@@ -939,13 +939,19 @@ function InovoLib:CreateWindow(options)
         
         -- Auto-select first tab
         if #self.Tabs == 1 then
-            task.wait(0.1)
-            tabContent.Visible = true
-            Tween(tabButton, {
-                BackgroundColor3 = InovoLib.Theme.Accent,
-                TextColor3 = InovoLib.Theme.TextPrimary
-            })
-            self.CurrentTab = Tab
+            task.spawn(function()
+                task.wait(0.05)
+                for _, tab in pairs(self.Tabs) do
+                    tab.Content.Visible = false
+                    tab.Button.BackgroundColor3 = InovoLib.Theme.BackgroundLight
+                    tab.Button.TextColor3 = InovoLib.Theme.TextSecondary
+                end
+                
+                tabContent.Visible = true
+                tabButton.BackgroundColor3 = InovoLib.Theme.Accent
+                tabButton.TextColor3 = InovoLib.Theme.TextPrimary
+                self.CurrentTab = Tab
+            end)
         end
         
         return Tab
